@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AnnaDaan — Food Donation Predictor (Soft Theme)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --saffron: #B5838D;
+    --saffron-light: #E5989B;
+    --saffron-pale: #FFB4A2;
+    --green: #6B705C;
+    --green-light: #A5A58D;
+    --cream: #FDFCF0;
+    --ink: #4A4E69;
+    --ink-60: rgba(74, 78, 105, 0.6);
+    --ink-20: rgba(74, 78, 105, 0.12);
+    --white: #FFFFFF;
+    --border: 1px solid rgba(74, 78, 105, 0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(253, 252, 240, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--saffron);
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--ink); }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: 0.875rem; font-weight: 500;
+    color: var(--ink-60); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--saffron); }
+  .nav-badge {
+    font-size: 0.75rem; background: var(--saffron-pale);
+    color: var(--white); padding: 4px 12px;
+    border-radius: 999px; border: 1px solid rgba(181, 131, 141, 0.2);
+    font-weight: 500;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 7rem 2rem 5rem;
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--saffron);
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 3.8rem);
+    font-weight: 900; line-height: 1.1;
+    letter-spacing: -1.5px; color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em { color: var(--saffron); font-style: normal; }
+  .hero-desc {
+    font-size: 1rem; line-height: 1.75;
+    color: var(--ink-60); max-width: 420px;
+    margin-bottom: 2rem;
+  }
+  .hero-stats {
+    display: flex; gap: 2rem; padding-top: 1.5rem;
+    border-top: var(--border);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700; color: var(--ink);
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.75rem; color: var(--ink-60); margin-top: 4px; }
+
+  /* DECORATIVE BOWL */
+  .hero-visual {
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .bowl-ring {
+    width: 340px; height: 340px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--saffron-pale), #f7ede2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    box-shadow: inset 0 -20px 60px rgba(181, 131, 141, 0.08), 0 20px 80px rgba(181, 131, 141, 0.1);
+  }
+  .bowl-ring::before {
+    content: ''; position: absolute; inset: 12px; border-radius: 50%;
+    border: 1px solid rgba(181, 131, 141, 0.15);
+  }
+  .bowl-emoji { font-size: 7rem; line-height: 1; animation: float 4s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  .floating-tag {
+    position: absolute; background: var(--white);
+    border: var(--border); border-radius: 12px;
+    padding: 10px 16px; font-size: 0.8rem; font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    animation: float 4s ease-in-out infinite;
+  }
+  .tag-1 { top: 20px; right: -10px; animation-delay: 0.5s; color: var(--green); }
+  .tag-2 { bottom: 40px; left: -20px; animation-delay: 1.2s; color: var(--saffron); }
+  .tag-3 { top: 50%; right: -30px; transform: translateY(-50%); animation-delay: 0.8s; }
+
+  /* PREDICTOR SECTION */
+  .predictor-section {
+    background: var(--ink);
+    padding: 5rem 2rem;
+    position: relative; overflow: hidden;
+  }
+  .predictor-section::before {
+    content: ''; position: absolute;
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(181, 131, 141, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .section-inner { max-width: 900px; margin: 0 auto; }
+  .section-head { text-align: center; margin-bottom: 3rem; }
+  .section-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--saffron-light); margin-bottom: 0.75rem;
+  }
+  .section-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700; color: var(--white);
+    letter-spacing: -0.5px; line-height: 1.2;
+  }
+
+  .predictor-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 2.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr auto;
+    gap: 1rem; margin-bottom: 1.5rem; align-items: end;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label {
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(255,255,255,0.5);
+  }
+  select, input[type="date"] {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; color: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+  }
+  select:focus, input[type="date"]:focus {
+    border-color: var(--saffron); background: rgba(255,255,255,0.1);
+  }
+  select option { background: #4a4e69; color: #fff; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+
+  .predict-btn {
+    padding: 12px 28px; background: var(--saffron);
+    border: none; border-radius: 10px;
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 500; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .predict-btn:hover { background: #966b74; }
+  .predict-btn:active { transform: scale(0.98); }
+
+  /* RESULTS */
+  .results-area { display: none; }
+  .results-area.visible { display: block; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+
+  .result-meta {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .result-shelter {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700; color: var(--white);
+  }
+  .result-date { font-size: 0.875rem; color: rgba(255,255,255,0.5); }
+  .badge {
+    font-size: 0.7rem; font-weight: 500; padding: 4px 10px;
+    border-radius: 999px; border: 1px solid;
+  }
+  .badge-weekend { color: var(--saffron-light); border-color: rgba(229,152,155,0.3); background: rgba(229,152,155,0.1); }
+  .badge-festival { color: #FFC94D; border-color: rgba(255,201,77,0.3); background: rgba(255,201,77,0.1); }
+
+  .metrics-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1rem; margin-bottom: 1rem;
+  }
+  .metric-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 1.25rem;
+  }
+  .metric-box.highlight { border-color: rgba(181,131,141,0.4); background: rgba(181,131,141,0.08); }
+  .m-label { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+  .m-value { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--white); line-height: 1; }
+  .m-unit { font-size: 0.85rem; font-weight: 300; color: rgba(255,255,255,0.5); margin-left: 4px; }
+  .m-range { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 6px; }
+
+  .result-footer {
+    display: flex; gap: 2rem; padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-wrap: wrap;
+  }
+  .rf-item { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+  .rf-item strong { color: rgba(255,255,255,0.7); font-weight: 500; }
+
+  /* HOW IT WORKS */
+  .how-section { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
+  .how-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 700; letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+  }
+  .how-section .sub { color: var(--ink-60); font-size: 1rem; margin-bottom: 3rem; }
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .step-card {
+    padding: 2rem; border: var(--border);
+    border-radius: 16px; background: var(--white);
+    position: relative; transition: box-shadow 0.2s;
+  }
+  .step-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 900;
+    color: var(--saffron-pale); line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+  .step-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem; }
+  .step-desc { font-size: 0.875rem; line-height: 1.7; color: var(--ink-60); }
+
+  /* SHELTERS */
+  .shelters-section {
+    background: var(--white); border-top: var(--border); border-bottom: var(--border);
+    padding: 5rem 2rem;
+  }
+  .shelters-inner { max-width: 1100px; margin: 0 auto; }
+  .shelters-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;
+  }
+  .shelters-inner .sub { color: var(--ink-60); font-size: 0.9rem; margin-bottom: 2rem; }
+  .shelters-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+  .shelter-pill {
+    padding: 12px 16px; border: var(--border);
+    border-radius: 10px; font-size: 0.82rem; font-weight: 500;
+    text-align: center; color: var(--ink);
+    transition: all 0.2s; cursor: pointer; background: var(--cream);
+  }
+  .shelter-pill:hover { background: var(--saffron-pale); border-color: rgba(181, 131, 141, 0.3); color: var(--saffron); }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,0.4);
+    text-align: center; padding: 2.5rem 2rem;
+    font-size: 0.8rem; line-height: 1.8;
+  }
+  footer strong { color: rgba(255,255,255,0.7); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 4rem 1.5rem 3rem; }
+    .hero-visual { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .shelters-grid { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Anna<span>Daan</span></div>
+  <div class="nav-links">
+    <a href="#predict">Predict</a>
+    <a href="#how">How it works</a>
+    <a href="#shelters">Shelters</a>
+  </div>
+  <div class="nav-badge">600 records · 2022–2024</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">AI-Powered Food Planning</p>
+    <h1>Feed more.<br/><em>Waste less.</em><br/>Plan smarter.</h1>
+    <p class="hero-desc">Predict how many people will arrive at your shelter and exactly how much food to prepare — using data-driven forecasts across 10 shelters in India.</p>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">10</div>
+        <div class="stat-label">Shelters tracked</div>
+      </div>
+      <div>
+        <div class="stat-num">600</div>
+        <div class="stat-label">Historical records</div>
+      </div>
+      <div>
+        <div class="stat-num">+66%</div>
+        <div class="stat-label">Festival day uplift</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="bowl-ring">
+      <div class="bowl-emoji">🍲</div>
+      <div class="floating-tag tag-1">+22% on weekends</div>
+      <div class="floating-tag tag-2">0.22 kg / person</div>
+      <div class="floating-tag tag-3">Festival uplift: +66%</div>
+    </div>
+  </div>
+</section>
+
+<!-- PREDICTOR -->
+<section class="predictor-section" id="predict">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="section-eyebrow">Prediction Engine</p>
+      <h2>Get your forecast</h2>
+    </div>
+
+    <div class="predictor-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Shelter</label>
+          <select id="shelter-sel">
+            <option>Aashraya Shelter</option>
+            <option>Annapurna Shelter</option>
+            <option>Asha Griha</option>
+            <option>Daya Niwas</option>
+            <option>Jeevan Kendra</option>
+            <option>Karuna Ashram</option>
+            <option>Prerna Niwas</option>
+            <option>Sahara Home</option>
+            <option>Seva Sadan</option>
+            <option>Umeed Niwas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" id="date-inp" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="opacity:0">–</label>
+          <button class="predict-btn" onclick="runPrediction()">Predict →</button>
+        </div>
+      </div>
+
+      <div class="results-area" id="results-area">
+        <div class="result-meta">
+          <div class="result-shelter" id="r-shelter"></div>
+          <div class="result-date" id="r-date"></div>
+          <div id="r-badges"></div>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-box highlight">
+            <div class="m-label">People expected</div>
+            <div class="m-value" id="r-people"><span class="m-unit"></span></div>
+            <div class="m-range" id="r-people-range"></div>
+          </div>
+          <div class="metric-box">
+            <div class="m-label">Food required</div>
+            <div class="m-value" id="r-food"><span class="m-unit">kg</span></div>
+            <div class="m-range" id="r-food-range"></div>
+          </div>
+          <div class="metric-box">
+            <div class="m-label">500g packs needed</div>
+            <div class="m-value" id="r-packs"></div>
+            <div class="m-range">&nbsp;</div>
+          </div>
+        </div>
+        <div class="result-footer">
+          <div class="rf-item">Season: <strong id="r-season"></strong></div>
+          <div class="rf-item">Day type: <strong id="r-day"></strong></div>
+          <div class="rf-item">Food per person: <strong id="r-fpp"></strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <h2>How the model works</h2>
+  <p class="sub">Trained on 600 historical records across 3 years (2022–2024)</p>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-title">Historical baseline</div>
+      <div class="step-desc">Each shelter has per-month averages and standard deviations derived from real service data, giving a realistic baseline for any date of the year.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-title">Day-type uplift</div>
+      <div class="step-desc">Weekends see 21.9% more visitors than weekdays. Festival days like Diwali, Holi, and Republic Day drive 66.4% higher turnout — both uplifts are applied when relevant.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-title">Food calculation</div>
+      <div class="step-desc">Each shelter has a calibrated food-per-person ratio (~0.21–0.22 kg). Multiply by the predicted headcount to get kilograms required and the number of 500g packs to prepare.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SHELTERS -->
+<section class="shelters-section" id="shelters">
+  <div class="shelters-inner">
+    <h2>10 shelters covered</h2>
+    <p class="sub">Click any shelter to pre-fill the predictor above</p>
+    <div class="shelters-grid" id="shelter-pills"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>AnnaDaan</strong> — Food Donation Prediction Model<br/>
+  Trained on 600 records · 2022–2024 · 10 shelters across India<br/>
+  Weekend uplift: +21.9% &nbsp;·&nbsp; Festival uplift: +66.4% &nbsp;·&nbsp; ~0.22 kg food per person
+</footer>
+
+<script>
+const SHELTER_DATA = {
+  "Aashraya Shelter": { fpp: 0.2183, m: { 1:{u:923.7,s:917.1},2:{u:657.7,s:421.0},3:{u:692.2,s:608.6},4:{u:1077.0,s:468.2},5:{u:474.0,s:282.8},6:{u:711.5,s:414.9},7:{u:685.2,s:435.0},8:{u:1021.6,s:669.0},9:{u:1013.4,s:779.3},10:{u:1563.8,s:391.7},11:{u:836.6,s:536.9},12:{u:1174.2,s:967.6} } },
+  "Annapurna Shelter": { fpp: 0.2105, m: { 1:{u:712.5,s:681.8},2:{u:975.3,s:356.0},3:{u:1179.4,s:642.1},4:{u:2750.0,s:1650.0},5:{u:1185.0,s:811.3},6:{u:770.3,s:333.6},7:{u:1283.5,s:713.8},8:{u:946.2,s:453.4},9:{u:1557.0,s:934.2},10:{u:905.8,s:610.3},11:{u:890.3,s:96.2},12:{u:959.9,s:737.5} } },
+  "Asha Griha": { fpp: 0.2149, m: { 1:{u:1897.8,s:728.2},2:{u:1314.3,s:807.9},3:{u:735.1,s:444.6},4:{u:1174.0,s:923.6},5:{u:666.5,s:354.5},6:{u:714.2,s:812.2},7:{u:516.0,s:316.2},8:{u:1139.5,s:553.4},9:{u:715.9,s:299.0},10:{u:1437.7,s:555.6},11:{u:1295.2,s:739.5},12:{u:1081.0,s:315.1} } },
+  "Daya Niwas": { fpp: 0.2205, m: { 1:{u:1680.8,s:1409.9},2:{u:785.6,s:419.8},3:{u:479.0,s:350.7},4:{u:1647.2,s:1127.4},5:{u:595.0,s:357.0},6:{u:838.0,s:251.9},7:{u:808.7,s:567.8},8:{u:716.3,s:719.3},9:{u:940.6,s:653.4},10:{u:1474.5,s:799.2},11:{u:1061.0,s:672.7},12:{u:583.2,s:404.7} } },
+  "Jeevan Kendra": { fpp: 0.2173, m: { 1:{u:1740.7,s:1771.3},2:{u:1137.0,s:780.4},3:{u:1088.0,s:596.4},4:{u:1269.1,s:949.3},5:{u:787.3,s:562.7},6:{u:489.0,s:358.9},7:{u:701.3,s:540.2},8:{u:1090.6,s:801.2},9:{u:891.0,s:567.1},10:{u:1409.5,s:1118.4},11:{u:1379.1,s:451.2},12:{u:1058.2,s:595.6} } },
+  "Karuna Ashram": { fpp: 0.2180, m: { 1:{u:1773.6,s:1461.1},2:{u:1484.3,s:513.2},3:{u:1220.3,s:1039.0},4:{u:839.8,s:503.3},5:{u:534.9,s:295.3},6:{u:724.4,s:510.7},7:{u:665.0,s:737.2},8:{u:1268.0,s:988.7},9:{u:1078.0,s:667.9},10:{u:817.0,s:472.6},11:{u:1417.0,s:802.6},12:{u:1755.6,s:1012.6} } },
+  "Prerna Niwas": { fpp: 0.2186, m: { 1:{u:1330.1,s:936.5},2:{u:1223.7,s:543.8},3:{u:1087.5,s:741.7},4:{u:934.6,s:407.8},5:{u:849.4,s:458.8},6:{u:924.0,s:547.7},7:{u:549.5,s:460.7},8:{u:979.0,s:575.7},9:{u:1130.3,s:1177.3},10:{u:1429.5,s:638.1},11:{u:1515.3,s:1064.1},12:{u:1311.1,s:560.9} } },
+  "Sahara Home": { fpp: 0.2195, m: { 1:{u:601.4,s:359.1},2:{u:945.1,s:480.1},3:{u:1184.5,s:814.8},4:{u:1006.8,s:591.2},5:{u:749.4,s:479.3},6:{u:1105.8,s:187.4},7:{u:496.0,s:357.6},8:{u:421.0,s:252.6},9:{u:821.4,s:673.9},10:{u:1178.5,s:623.7},11:{u:1363.7,s:968.5},12:{u:1529.3,s:934.0} } },
+  "Seva Sadan": { fpp: 0.2136, m: { 1:{u:1357.7,s:1219.8},2:{u:1882.8,s:1105.7},3:{u:1145.8,s:1217.5},4:{u:520.3,s:310.0},5:{u:822.0,s:493.2},6:{u:490.6,s:427.0},7:{u:574.8,s:172.7},8:{u:959.0,s:512.0},9:{u:1024.8,s:597.3},10:{u:1172.0,s:378.0},11:{u:808.8,s:620.4},12:{u:743.7,s:624.7} } },
+  "Umeed Niwas": { fpp: 0.2145, m: { 1:{u:1665.6,s:1093.8},2:{u:1266.3,s:914.3},3:{u:355.0,s:213.0},4:{u:1641.2,s:967.3},5:{u:851.9,s:731.9},6:{u:1454.4,s:478.6},7:{u:669.0,s:401.4},8:{u:1500.8,s:1172.2},10:{u:686.2,s:297.8},11:{u:928.5,s:785.6},12:{u:1474.0,s:1027.3} } },
+};
+
+const SHELTERS = Object.keys(SHELTER_DATA);
+const WEEKEND_MULT = 1.219, FESTIVAL_MULT = 1.664;
+const FESTIVAL_DATES = new Set(["1-14","1-15","1-26","3-25","3-26","4-14","8-15","10-2","10-12","10-23","10-24","11-1","11-12","11-15","12-25"]);
+const WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS = ["","January","February","March","April","May","June","July","August","September","October","November","December"];
+const SEASONS = {12:"Winter",1:"Winter",2:"Winter",3:"Summer",4:"Summer",5:"Summer",6:"Monsoon",7:"Monsoon",8:"Monsoon",9:"Monsoon",10:"Post-Monsoon",11:"Post-Monsoon"};
+
+function isFest(m,d){ return FESTIVAL_DATES.has(`${m}-${d}`); }
+
+function predict(name, dateStr){
+  const d = new Date(dateStr + "T00:00:00");
+  const m = d.getMonth()+1, day = d.getDate(), dow = d.getDay();
+  const isWe = dow===0||dow===6, isFestival = isFest(m,day);
+  const {fpp, m:ms} = SHELTER_DATA[name];
+  const {u,s} = ms[m];
+  const wm = isWe?WEEKEND_MULT:1, fm = isFestival?FESTIVAL_MULT:1;
+  const people = Math.round(u*wm*fm);
+  const lowP = Math.max(0,Math.round((u-s)*wm*fm));
+  const highP = Math.round((u+s)*wm*fm);
+  return {
+    name, d, weekday: WEEKDAYS[dow], season: SEASONS[m],
+    isWe, isFestival,
+    people, lowP, highP,
+    food: Math.round(people*fpp*10)/10,
+    lowFood: Math.round(lowP*fpp*10)/10,
+    highFood: Math.round(highP*fpp*10)/10,
+    packs: Math.ceil(people*fpp/0.5), fpp, m
+  };
+}
+
+function runPrediction(){
+  const name = document.getElementById("shelter-sel").value;
+  const dateVal = document.getElementById("date-inp").value;
+  if(!dateVal){ alert("Please select a date."); return; }
+  const r = predict(name, dateVal);
+  document.getElementById("r-shelter").textContent = r.name;
+  document.getElementById("r-date").textContent = `${r.weekday}, ${r.d.getDate()} ${MONTHS[r.m]} ${r.d.getFullYear()} · ${r.season}`;
+  const b = document.getElementById("r-badges");
+  b.innerHTML = "";
+  if(r.isWe) b.innerHTML += `<span class="badge badge-weekend">Weekend +22%</span> `;
+  if(r.isFestival) b.innerHTML += `<span class="badge badge-festival">Festival +66%</span>`;
+  document.getElementById("r-people").innerHTML = `${r.people.toLocaleString()}`;
+  document.getElementById("r-people-range").textContent = `${r.lowP.toLocaleString()} – ${r.highP.toLocaleString()} realistic range`;
+  document.getElementById("r-food").innerHTML = `${r.food.toFixed(1)}<span class="m-unit"> kg</span>`;
+  document.getElementById("r-food-range").textContent = `${r.lowFood.toFixed(1)} – ${r.highFood.toFixed(1)} kg range`;
+  document.getElementById("r-packs").textContent = r.packs.toLocaleString();
+  document.getElementById("r-season").textContent = r.season;
+  document.getElementById("r-day").textContent = r.isWe?"Weekend":"Weekday";
+  document.getElementById("r-fpp").textContent = `${r.fpp.toFixed(4)} kg`;
+  const ra = document.getElementById("results-area");
+  ra.classList.remove("visible");
+  void ra.offsetWidth;
+  ra.classList.add("visible");
+  ra.style.display = "block";
+}
+
+// Build shelter pills
+const grid = document.getElementById("shelter-pills");
+SHELTERS.forEach(name => {
+  const el = document.createElement("div");
+  el.className = "shelter-pill"; el.textContent = name;
+  el.onclick = () => {
+    document.getElementById("shelter-sel").value = name;
+    document.getElementById("predict").scrollIntoView({behavior:"smooth"});
+  };
+  grid.appendChild(el);
+});
+
+// Default date to today
+document.getElementById("date-inp").value = new Date().toISOString().split("T")[0];
+</script>
+</body>
+</html>
